@@ -156,8 +156,10 @@ std::vector<std::vector<Point>> generateChecks(std::vector<Point>& mino) {
     checks.push_back(rotatePolyominoCW(checks.at(0)));// rot once
     checks.push_back(rotatePolyominoCW(checks.at(1)));// rot twice
     checks.push_back(rotatePolyominoCW(checks.at(2)));// rot thrice
-    for (size_t i = 0; i < checks.size(); ++i) // for each check
+    for (size_t i = 0; i < checks.size(); ++i) { // for each check
         translatePolyominoToTL(checks.at(i));  // translate it to the top left
+        sortPolyomino(checks.at(i));
+    }
     return checks;
 }
 
@@ -175,10 +177,6 @@ bool polyominoesAreEqualUsingChecks(std::vector<std::vector<Point>>& checks, std
     for (size_t k = 0; k < checks.size(); ++k)
         for (size_t l = 0; l < otherChecks.size(); ++l)
             if(polyominoesAreEqual(checks.at(k), otherChecks.at(l))) return true;
-            //if (std::equal(checks.at(k).begin(), checks.at(k).end(), otherChecks.at(l).begin())) {
-            //    std::cout << "EQUAL ";
-            //    return true;
-            //}
     return false;
 
 }
@@ -195,9 +193,7 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
     if (n == MAX_ITERATIONS) return previous;
 
     // if n == 0, then then previous should start with a domino since every polyomino >3 is derived from a domino
-    if (n == 0) {
-        previous.push_back(std::vector<Point>{Point{ 0, 0 }, Point{ 0, 1 }});
-    }
+    if (n == 0)  previous.push_back(std::vector<Point>{Point{ 0, 0 }, Point{ 0, 1 }});
     
     std::vector<std::vector<Point>> newPolyominoes;
     newPolyominoes.reserve(n * n); // n^2 should be sufficient
@@ -257,15 +253,14 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
 
     // Now that we have all possible branching polyominoes, remove duplicates
     for (size_t i = 0; i < newPolyominoes.size(); ++i) { // for each polyomino
-        sortPolyomino(newPolyominoes.at(i));
         bool isDuplicate{ false };
 
         std::vector<std::vector<Point>> checks = generateChecks(newPolyominoes.at(i));
 
         for (size_t j = 0; j < newPolyominoes.size(); ++j) { // for each other polyomino
             if (i == j) continue;
-            std::vector<std::vector<Point>> otherChecks = generateChecks(newPolyominoes.at(j));
 
+            std::vector<std::vector<Point>> otherChecks = generateChecks(newPolyominoes.at(j));
 
             if (polyominoesAreEqualUsingChecks(checks, otherChecks)) {
                 isDuplicate = true;
