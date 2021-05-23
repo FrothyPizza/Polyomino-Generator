@@ -1,9 +1,10 @@
-
-
 #include <iostream>
+#include <string>
+
 #include <vector>
-#include<string>
 #include <algorithm>
+
+#include <fstream>  
 
 struct Point {
     int x, y;
@@ -193,7 +194,13 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
     if (n == MAX_ITERATIONS) return previous;
 
     // if n == 0, then then previous should start with a domino since every polyomino >3 is derived from a domino
-    if (n == 0)  previous.push_back(std::vector<Point>{Point{ 0, 0 }, Point{ 0, 1 }});
+    //if (n == 0)  previous.push_back(std::vector<Point>{Point{ 0, 0 }, Point{ 0, 1 }});
+    if (n <= 1) {
+        n = 1;
+        previous.push_back(std::vector<Point>{Point{ 0, 0 }});
+
+        if (MAX_ITERATIONS <= 1) return previous;
+    }
     
     std::vector<std::vector<Point>> newPolyominoes;
     newPolyominoes.reserve(n * n); // n^2 should be sufficient
@@ -274,27 +281,52 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
         }
     }
     
-    std::cout << "Completed for n = " << n + 2 << '\n'; // for showing progress
+    std::cout << "Completed for n = " << n << '\n'; // for showing progress
     return generatePolyominoes(newPolyominoes, MAX_ITERATIONS, n + 1);
 }
 
-int main() {
-    int n = 7;
 
-    std::vector<std::vector<Point>> a{};
-    std::vector<std::vector<Point>> minos{ generatePolyominoes(a, n-2) };
-
+void outputPolyominoesToFile(std::string fileName, std::vector<std::vector<Point>>& minos) {
+    std::ofstream file(fileName);
     for (size_t i = 0; i < minos.size(); ++i) {
-        translatePolyominoToTL(minos.at(i));
-        printPolyomino(minos.at(i));
+        for (size_t j = 0; j < minos.at(i).size(); ++j)
+            file << "(" << minos.at(i).at(j).x << ", " << minos.at(i).at(j).y << "), ";
+        file << "\n";
+    }
+    file.close();
+}
+
+int main() {
+    // i realize that this calls generatePolyominoes() stupidly, but whatever
+    for (int i = 1; i <= 9; ++i) {
+        int n = i;
+        std::cout << n << "A\n";
+
+        std::vector<std::vector<Point>> a{};
+        std::vector<std::vector<Point>> minos{ generatePolyominoes(a, n) };
+
+        for (auto& m : minos) translatePolyominoToTL(m);
+
+        outputPolyominoesToFile(std::string("Polyominoes/Polyominoes Size ") + std::to_string(n) + std::string(".txt"), minos);
+        std::cout << "outputted for n = " << n << '\n';
     }
 
-    for (size_t i = 0; i < minos.size(); ++i)
-        drawPolyomino(minos.at(i));
 
+    //int n = 7;
 
-    std::cout << '\n' << "n = " << n << '\n';
-    std::cout << "Number of polyominoes: " << minos.size() << '\n';
+    //std::vector<std::vector<Point>> a{};
+    //std::vector<std::vector<Point>> minos{ generatePolyominoes(a, n) };
+
+    //for (size_t i = 0; i < minos.size(); ++i) {
+    //    translatePolyominoToTL(minos.at(i));
+    //    printPolyomino(minos.at(i));
+    //}
+
+    //for (size_t i = 0; i < minos.size(); ++i)
+    //    drawPolyomino(minos.at(i));
+
+    //std::cout << '\n' << "n = " << n << '\n';
+    //std::cout << "Number of polyominoes: " << minos.size() << '\n';
 
 
 
