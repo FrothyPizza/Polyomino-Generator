@@ -64,33 +64,34 @@ struct Point {
 };
 
 void sortPolyomino(std::vector<Point>& polyomino) {
-    //// bubble sort
-    //for (size_t i = 0; i < polyomino.size(); ++i) {
-    //    for (size_t j = i; j < polyomino.size()-1; ++j) {
-    //        // if one first > second, swap them
-    //        if (polyomino.at(j).isGreaterThan(polyomino.at(j + 1))) {
-    //            Point first{ polyomino.at(j) };
-    //            Point second{ polyomino.at(j + 1) };
+    // bubble sort
+    for (size_t i = 0; i < polyomino.size(); ++i) {
+        for (size_t j = i; j < polyomino.size()-1; ++j) {
+            // if one first > second, swap them
+            if (polyomino.at(j).isGreaterThan(polyomino.at(j + 1))) {
+                Point first{ polyomino.at(j) };
+                Point second{ polyomino.at(j + 1) };
 
-    //            polyomino.at(j) = second;
-    //            polyomino.at(j + 1) = first;
-    //        }
-    //    }
-    //}
-
-    // insertion sort
-    size_t i, j;
-    Point key;
-    for (i = 1; i < polyomino.size(); i++) {
-        key = polyomino[i];
-        j = i - 1;
-
-        while (j >= 0 && polyomino[j] > key) {
-            polyomino[j + 1] = polyomino[j];
-            --j;
+                polyomino.at(j) = second;
+                polyomino.at(j + 1) = first;
+            }
         }
-        polyomino[j + 1] = key;
     }
+
+    // this sometimes doesn't work, so for now it must be commented
+    //// insertion sort
+    //size_t i, j;
+    //Point key;
+    //for (i = 1; i < polyomino.size(); i++) {
+    //    key = polyomino[i];
+    //    j = i - 1;
+
+    //    while (j >= 0 && polyomino[j] > key) {
+    //        polyomino[j + 1] = polyomino[j];
+    //        --j;
+    //    }
+    //    polyomino[j + 1] = key;
+    //}
 
 }
 
@@ -216,9 +217,7 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
     }
     
     std::vector<std::vector<Point>> newPolyominoes;
-    newPolyominoes.reserve(n * n); // n^2 should be sufficient
-
-
+    newPolyominoes.reserve(n * n * n); // n^3 should be sufficient
 
     // Generate all possible branching polyominoes (this will make duplicates)
     for (size_t i = 0; i < previous.size(); ++i) {
@@ -269,7 +268,6 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
         }
     }
 
-    for (size_t i = 0; i < newPolyominoes.size(); ++i) sortPolyomino(newPolyominoes.at(i));
 
     // Now that we have all possible branching polyominoes, remove duplicates
     for (size_t i = 0; i < newPolyominoes.size(); ++i) { // for each polyomino
@@ -326,7 +324,7 @@ int main() {
     //}
 
 
-    int n = 9;
+    int n = 8;
 
     std::vector<std::vector<Point>> a{};
     std::vector<std::vector<Point>> minos{ generatePolyominoes(a, n) };
@@ -334,7 +332,7 @@ int main() {
     for (auto& m : minos) translatePolyominoToTL(m);
 
     outputPolyominoesToFile(std::string("Polyominoes/Polyominoes Size ") + std::to_string(n) + std::string(".txt"), minos);
-    std::cout << "outputted for n = " << n << '\n';
+    std::cout << "outputted for n = " << n << " with " << minos.size() << " polyominoes" << '\n';
 
 
     //int n = 7;
