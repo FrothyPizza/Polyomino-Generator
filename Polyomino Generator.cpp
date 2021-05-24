@@ -5,6 +5,8 @@
 #include <algorithm>
 
 #include <fstream>  
+#include <time.h>
+
 
 
 
@@ -268,19 +270,24 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
         }
     }
 
-
+    std::vector<std::vector<std::vector<Point>>> checks; checks.reserve(newPolyominoes.size());
+    for (auto& i : newPolyominoes) {
+        sortPolyomino(i);
+        checks.push_back(generateChecks(i));
+    }
     // Now that we have all possible branching polyominoes, remove duplicates
     for (size_t i = 0; i < newPolyominoes.size(); ++i) { // for each polyomino
         bool isDuplicate{ false };
 
-        std::vector<std::vector<Point>> checks = generateChecks(newPolyominoes.at(i));
+        //std::vector<std::vector<Point>> checks = generateChecks(newPolyominoes.at(i));
 
         for (size_t j = 0; j < newPolyominoes.size(); ++j) { // for each other polyomino
             if (i == j) continue;
 
-            std::vector<std::vector<Point>> otherChecks = generateChecks(newPolyominoes.at(j));
+            //std::vector<std::vector<Point>> otherChecks = generateChecks(newPolyominoes.at(j));
 
-            if (polyominoesAreEqualUsingChecks(checks, otherChecks)) {
+            //if (polyominoesAreEqualUsingChecks(checks, otherChecks)) {
+            if (polyominoesAreEqualUsingChecks(checks[i], checks[j])) {
                 isDuplicate = true;
                 break;
             }
@@ -288,6 +295,7 @@ std::vector<std::vector<Point>> generatePolyominoes(std::vector<std::vector<Poin
         }
         if (isDuplicate) {
             newPolyominoes.erase(newPolyominoes.begin() + i);
+            checks.erase(checks.begin() + i);
             --i;
         }
     }
@@ -324,10 +332,14 @@ int main() {
     //}
 
 
+
     int n = 8;
 
     std::vector<std::vector<Point>> a{};
+    auto before = clock();
     std::vector<std::vector<Point>> minos{ generatePolyominoes(a, n) };
+    auto after = clock();
+    std::cout << "MS: " << after - before << '\n'; 
 
     for (auto& m : minos) translatePolyominoToTL(m);
 
